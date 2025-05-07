@@ -1,0 +1,24 @@
+.section .data
+
+Lower: .asciz "hello12%WOrld"      
+end:
+
+.set size, end - Lower
+
+Upper: .skip size
+
+.section .text
+
+    # write(1, Upper, size)
+    movq $1, %rax            # syscall: sys_write
+    movq $1, %rdi            #   fd = 1 (stdout)
+    lea  Upper(%rip), %rsi   #   buf = address of Upper
+    movq $size, %rdx         #   count = size
+    syscall
+
+    # exit(0)
+    movq $60, %rax           # syscall: sys_exit
+    xor  %rdi, %rdi          #   status = 0
+    syscall
+
+
