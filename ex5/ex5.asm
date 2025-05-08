@@ -1,8 +1,8 @@
 .global _start
 
-# used registers: rax, rsi, rbx, r9-13, cl, ch
-# cl is 1, if there is a number string 
-# ch is 1, if there is a word
+# used registers: rax, rsi, rbx, r9-13
+# edx is 1, if there is a number string 
+# edi is 1, if there is a word
 
 .section .text
 _start: 
@@ -17,13 +17,14 @@ reset_words_HW1:
     movq $0x64697620, %r11  # "div"
 
 start_loop_HW1:
-    movzq %cl, %r12
-    andb %ch, %r12b
-    cmpb $1, %r12
+    movl %edx, %r12d
+    movl %edi, %r13d
+    andb %r13b, %r12b
+    cmpb $1, %r12b
     je exit_3_HW1 # no point in continuing to search
     movq $0, %r12
     movq (%rax, %rsi, 1), %rbx
-    cmpb %bl, $0
+    cmpb $0, %bl
     je choose_exit_HW1 # reached '\0'
     cmpb $'a', %bl
     je check_add_HW1
@@ -47,7 +48,7 @@ check_after_i_HW1: # in case of ii...
 check_add_HW1:
     cmpb $0, %r8b
     je check_if_space
-    cmbb %r8b, %bl
+    cmpb %r8b, %bl
     jne continue_until_space_HW1
     shrq $8, %r8
     incq %rsi
@@ -57,7 +58,7 @@ check_add_HW1:
 check_sub_HW1:
     cmpb $0, %r9b
     je check_if_space
-    cmbb %r9b, %bl
+    cmpb %r9b, %bl
     jne continue_until_space_HW1
     shrq $8, %r9
     incq %rsi
@@ -67,7 +68,7 @@ check_sub_HW1:
 check_mul_HW1:
     cmpb $0, %r10b
     je check_if_space
-    cmbb %r10b, %bl
+    cmpb %r10b, %bl
     jne continue_until_space_HW1
     shrq $8, %r10
     incq %rsi
@@ -77,7 +78,7 @@ check_mul_HW1:
 check_div_HW1:
     cmpb $0, %r11b
     je check_if_space
-    cmbb %r11b, %bl
+    cmpb %r11b, %bl
     jne continue_until_space_HW1
     shrq $8, %r11
     incq %rsi
@@ -86,13 +87,14 @@ check_div_HW1:
 
 check_if_space:
     cmp $' ', %bl
-    cmov $1, %ch
+    movl $1, %r12d
+    cmove %r12d, %edi
     jmp continue_until_space_HW1
 
 check_if_number_init_HW1:
     cmpb $'0', %bl
-    je check_number_type_HW1:
-    jmp check_if_number_HW1:
+    je check_number_type_HW1
+    jmp check_if_number_HW1
 
 check_number_type_HW1:
     incq %rsi
@@ -114,7 +116,8 @@ inc_and_check_whole_number_HW1:
     incq %rsi
     movq (%rax, %rsi, 1), %rbx
     cmpb $' ', %bl
-    cmov $1, %cl
+    movl $1, %r12d
+    cmove %r12d, %edx
     je continue_HW1
     movq $0, %r12
     movq $0, %r13
@@ -145,9 +148,9 @@ exit_3_HW1:
     movb $3, Result(%rip)
     jmp exit_HW1
 choose_exit_HW1:
-    cmpb $1, %cl 
+    cmpl $1, %edx
     je exit_2_HW1
-    cmpb $1, %ch
+    cmpl $1, %edi
     je exit_1_HW1
     movb $0, Result(%rip)
     jmp exit_HW1
