@@ -1,22 +1,14 @@
 .section .data
 
-Buffer:
-    .byte 'g','g','e','g'          # 5-byte palindrome
+String: .asciz "hello idiv 0x18"       
 
-Address:
-    .quad Buffer                   # pointer to start of Buffer
-
-Length:
-    .int 4                         # length of Buffer
-
-Result:
-    .byte 0                        # ex2.asm will write 0 or 1 here
+Result: .byte 5                        
 
 
 .section .text
 
     movzbl Result(%rip), %eax  
-    cmp $0, %al                
+    cmp $3, %al                
     je success                 
 
 error:
