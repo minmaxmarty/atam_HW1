@@ -6,15 +6,19 @@
 
 .section .text
 _start: 
-    movq String(%rip), %rax # rax = &String[0]
+    leaq String(%rip), %rax # rax = &String[0]
     movq $0, %rsi # i = 0 (index)
     movq $0, %rcx # init rcx = 0 
+    movq $0, %rdx
+    movq $0, %rdi
+    movq $1, %rbx
     
 reset_words_HW1:
-    movq $0x61646420, %r8   # "add"
-    movq $0x73756220, %r9   # "sub"
-    movq $0x6D756C20, %r10  # "mul"
-    movq $0x64697620, %r11  # "div"
+    movq $0x646461, %r8   # "add"
+    movq $0x627573, %r9   # "sub"
+    movq $0x6C756D, %r10  # "mul"
+    movq $0x766964, %r11  # "div"
+
 
 start_loop_HW1:
     movl %edx, %r12d
@@ -22,7 +26,10 @@ start_loop_HW1:
     andb %r13b, %r12b
     cmpb $1, %r12b
     je exit_3_HW1 # no point in continuing to search
-    movq $0, %r12
+    movq $0, %r12 # reset
+    movq $1, %r13 # reset
+    cmpb $0, %bl
+    je choose_exit_HW1 # reached '\0'
     movq (%rax, %rsi, 1), %rbx
     cmpb $0, %bl
     je choose_exit_HW1 # reached '\0'
@@ -36,7 +43,7 @@ start_loop_HW1:
     je check_div_HW1
     cmpb $'i', %bl
     je check_after_i_HW1
-    jmp check_if_number_HW1
+    jmp check_if_number_init_HW1
     
 check_after_i_HW1: # in case of ii...
     incq %rsi
@@ -118,9 +125,11 @@ inc_and_check_whole_number_HW1:
     cmpb $' ', %bl
     movl $1, %r12d
     cmove %r12d, %edx
+    cmpb $0, %bl
+    cmove %r12d, %edx
     je continue_HW1
     movq $0, %r12
-    movq $0, %r13
+    movq $1, %r13
     jmp check_if_number_HW1
 
 check_if_number_HW1:
